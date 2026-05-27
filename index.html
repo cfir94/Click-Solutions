@@ -46,9 +46,9 @@
       background:var(--paper);
       color:var(--ink);
       line-height:1.65;
-      overflow-x:hidden;
       -webkit-font-smoothing:antialiased;
       cursor:none;
+      max-width:100vw;
     }
     @media(hover:none){body{cursor:auto}}
     a{text-decoration:none;color:inherit}
@@ -1133,8 +1133,26 @@
 
 <!-- ═══════════════════════════════════════
      SCRIPTS
-═══════════════════════════════════════ */
+═══════════════════════════════════════ -->
 <script>
+/* ─── Scroll Reveal (global, runs before IIFE) ─── */
+function revealCheck(){
+  var vH = window.innerHeight || document.documentElement.clientHeight;
+  var els = document.querySelectorAll('.reveal:not(.visible)');
+  for(var i=0;i<els.length;i++){
+    var r = els[i].getBoundingClientRect();
+    if(r.top < vH * 0.94 && r.bottom > 0) els[i].classList.add('visible');
+  }
+}
+window.addEventListener('scroll', revealCheck, {passive:true});
+window.addEventListener('resize', revealCheck, {passive:true});
+// Run once DOM is ready
+if(document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', revealCheck);
+} else {
+  revealCheck();
+}
+
 (function(){
   'use strict';
 
@@ -1299,17 +1317,16 @@
     }
   });
 
-  /* ─── Scroll Reveal (IntersectionObserver) ─── */
-  const revealEls = document.querySelectorAll('.reveal');
-  const revObs = new IntersectionObserver(entries=>{
-    entries.forEach(e=>{
-      if(e.isIntersecting){
-        e.target.classList.add('visible');
-        revObs.unobserve(e.target);
-      }
-    });
-  },{threshold:.10});
-  revealEls.forEach(el=>revObs.observe(el));
+  /* ─── Scroll Reveal (IO enhancement only — scroll listener is global) ─── */
+  if('IntersectionObserver' in window){
+    const revObs = new IntersectionObserver(entries=>{
+      entries.forEach(e=>{
+        if(e.isIntersecting){ e.target.classList.add('visible'); revObs.unobserve(e.target); }
+      });
+    },{threshold:.08, rootMargin:'0px 0px -40px 0px'});
+    document.querySelectorAll('.reveal').forEach(el=>revObs.observe(el));
+  }
+  revealCheck(); // run global function immediately too
 
   /* ─── Animated Counters ─── */
   function easeOut(t){ return 1-(1-t)*(1-t)*(1-t) }
@@ -1328,19 +1345,30 @@
     requestAnimationFrame(step);
   }
   const counterEls=document.querySelectorAll('.stat-num[data-target]');
-  const cntObs=new IntersectionObserver(entries=>{
-    entries.forEach(e=>{
-      if(e.isIntersecting){
-        if(!prefersReduced) animCounter(e.target);
-        else {
-          const t=e.target.dataset.target, s=e.target.dataset.suffix||'';
-          e.target.innerHTML=t+'<span>'+s+'</span>';
-        }
-        cntObs.unobserve(e.target);
-      }
+  function triggerCounter(el){
+    if(el.dataset.animated) return;
+    el.dataset.animated='1';
+    if(!prefersReduced) animCounter(el);
+    else {
+      const t=el.dataset.target, s=el.dataset.suffix||'';
+      el.innerHTML=t+'<span>'+s+'</span>';
+    }
+  }
+  function checkCounters(){
+    const vh = window.innerHeight || document.documentElement.clientHeight;
+    counterEls.forEach(el=>{
+      const r=el.getBoundingClientRect();
+      if(r.top < vh * 0.9 && r.bottom > 0) triggerCounter(el);
     });
-  },{threshold:.5});
-  counterEls.forEach(el=>cntObs.observe(el));
+  }
+  window.addEventListener('scroll', checkCounters, {passive:true});
+  if('IntersectionObserver' in window){
+    const cntObs=new IntersectionObserver(entries=>{
+      entries.forEach(e=>{ if(e.isIntersecting){ triggerCounter(e.target); cntObs.unobserve(e.target); } });
+    },{threshold:.4});
+    counterEls.forEach(el=>cntObs.observe(el));
+  }
+  checkCounters();
 
   /* ─── 3D Tilt on Service Cards ─── */
   if(!prefersReduced && window.innerWidth>900){
@@ -1361,13 +1389,21 @@
 
   /* ─── Process connector line ─── */
   const pLine=document.getElementById('processLine');
-  if(pLine){
-    const pObs=new IntersectionObserver(entries=>{
-      entries.forEach(e=>{
-        if(e.isIntersecting){ pLine.classList.add('visible'); pObs.unobserve(e.target); }
-      });
-    },{threshold:.3});
-    pObs.observe(document.getElementById('processGrid'));
+  const pGrid=document.getElementById('processGrid');
+  if(pLine && pGrid){
+    function checkProcessLine(){
+      const r=pGrid.getBoundingClientRect();
+      const vh=window.innerHeight||document.documentElement.clientHeight;
+      if(r.top < vh * 0.8){ pLine.classList.add('visible'); window.removeEventListener('scroll',checkProcessLine); }
+    }
+    window.addEventListener('scroll', checkProcessLine, {passive:true});
+    if('IntersectionObserver' in window){
+      const pObs=new IntersectionObserver(entries=>{
+        entries.forEach(e=>{ if(e.isIntersecting){ pLine.classList.add('visible'); pObs.unobserve(e.target); } });
+      },{threshold:.25});
+      pObs.observe(pGrid);
+    }
+    checkProcessLine();
   }
 
   /* ─── Contact Form ─── */
