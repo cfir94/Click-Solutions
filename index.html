@@ -106,7 +106,7 @@
     /* ═══════════════════════════════════════
        UTILITIES
     ═══════════════════════════════════════ */
-    .container{max-width:var(--max-w);margin:0 auto;padding:0 var(--pad-x)}
+    .container{max-width:var(--max-w);margin:0 auto;padding:0 var(--pad-x);width:100%}
     .tag{
       display:inline-block;
       font-family:var(--font-mo);
@@ -189,7 +189,7 @@
     .logo{
       display:inline-flex;align-items:baseline;
       font-family:var(--font-en);font-weight:700;
-      font-size:22px;letter-spacing:-.05em;
+      font-size:18px;letter-spacing:-.05em;
       color:var(--fg);flex-shrink:0;
       transition:color .3s;
       direction:ltr; /* keep cursor on right side of English text */
@@ -241,7 +241,7 @@
     .hero-bg-net{
       position:absolute;inset:0;width:100%;height:100%;
       pointer-events:none;z-index:1;
-      opacity:.35; /* ambient background under the cinema layer */
+      opacity:.18; /* subtle — video carries the left-side visual */
     }
     /* gentle pulse for AI hub */
     @keyframes hubPulse{0%,100%{opacity:.55}50%{opacity:1}}
@@ -263,14 +263,15 @@
       width:100%;height:100%;
       pointer-events:none;z-index:0.8;
       object-fit:cover;object-position:left center;
-      opacity:.28;
-      /* mask to left side so it doesn't interfere with right-side hero content */
-      -webkit-mask-image:linear-gradient(to left, transparent 0%, rgba(0,0,0,.15) 15%, black 35%);
-              mask-image:linear-gradient(to left, transparent 0%, rgba(0,0,0,.15) 15%, black 35%);
+      opacity:.32;
+      /* fade from left (visible) into the title zone (invisible).
+         gradient stops align with the ~52% content right boundary. */
+      -webkit-mask-image:linear-gradient(to left, transparent 0%, rgba(0,0,0,.08) 25%, black 52%);
+              mask-image:linear-gradient(to left, transparent 0%, rgba(0,0,0,.08) 25%, black 52%);
       will-change:opacity;
     }
     @media(max-width:760px){
-      .hero-video-bg{opacity:.12}
+      .hero-video-bg{opacity:.14}
     }
     @media(prefers-reduced-motion:reduce){
       .hero-video-bg{opacity:0}
@@ -280,12 +281,7 @@
        HERO CINEMA — 3-scene cycling background
     ═══════════════════════════════════════ */
     .hero-cinema{
-      position:absolute;inset:0;
-      pointer-events:none;z-index:1;
-      overflow:hidden;opacity:.88;
-      /* soft right fade so any stray content doesn't reach the H1 area */
-      -webkit-mask-image:linear-gradient(to left, transparent 0%, rgba(0,0,0,.4) 30%, black 50%);
-              mask-image:linear-gradient(to left, transparent 0%, rgba(0,0,0,.4) 30%, black 50%);
+      display:none!important; /* stored for re-use elsewhere — not in hero for now */
     }
     .cine-scene{
       position:absolute;inset:0;
@@ -469,16 +465,19 @@
     /* hero 2-col layout */
     .hero-inner{
       position:relative;z-index:1;padding:80px 0 100px;
-      display:flex;align-items:center;gap:clamp(32px,4vw,72px);
+      display:flex;align-items:center;
       width:100%;
     }
-    .hero-content{flex:1;min-width:0}
-    @media(max-width:1024px){
-      .hero-terminal{width:360px}
+    /* Title occupies the right portion; video/network breathe on the left.
+       margin-inline-end:auto in RTL pushes the block to the right (start edge). */
+    .hero-content{
+      flex:none;
+      width:min(580px, 55%);
+      margin-inline-end:auto; /* RTL: pushes content toward right edge */
     }
     @media(max-width:860px){
       .hero-inner{flex-direction:column;align-items:flex-start;padding:64px 0 72px}
-      .hero-terminal{width:100%;min-height:220px}
+      .hero-content{width:100%;margin-inline-end:0}
     }
 
     /* mouse-glow */
@@ -492,7 +491,7 @@
       will-change:transform;
     }
 
-    .hero-inner{position:relative;z-index:5;padding:80px 0 100px;max-width:980px}
+    .hero-inner{z-index:5}
     .hero-eyebrow{
       font-family:var(--font-mo);font-size:11px;
       letter-spacing:2.4px;text-transform:uppercase;
