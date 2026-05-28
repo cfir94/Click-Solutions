@@ -64,8 +64,7 @@
       outline:2px solid var(--neon);
       outline-offset:3px;
     }
-    /* custom cursor only on interactive targets */
-    a,button,.btn,[role="button"],.svc-card,.why-feat,.roi-tile,.stat-item,.logo-bar-item{cursor:none}
+    /* cursor defaults to auto */
     input,textarea,select,[contenteditable]{cursor:text!important}
     @media(hover:none){body{cursor:auto}}
     a{text-decoration:none;color:inherit}
@@ -73,35 +72,6 @@
     img{max-width:100%;display:block}
     button,input,textarea,select{font-family:inherit;font-size:inherit}
 
-    /* ═══════════════════════════════════════
-       CUSTOM CURSOR
-    ═══════════════════════════════════════ */
-    #cursor-dot{
-      position:fixed;
-      width:8px;height:8px;
-      background:var(--neon);
-      border-radius:50%;
-      pointer-events:none;
-      z-index:9999;
-      transform:translate(-50%,-50%);
-      transition:transform .1s var(--ease),width .25s var(--ease),height .25s var(--ease),opacity .25s;
-      box-shadow:0 0 12px var(--neon-glow),0 0 24px var(--neon-glow);
-    }
-    #cursor-ring{
-      position:fixed;
-      width:36px;height:36px;
-      border:1.5px solid rgba(196,241,44,.5);
-      border-radius:50%;
-      pointer-events:none;
-      z-index:9998;
-      transform:translate(-50%,-50%);
-      transition:transform .2s var(--ease),width .3s var(--ease),height .3s var(--ease),border-color .3s;
-    }
-    body:has(a:hover,button:hover) #cursor-dot,
-    body.js-hover-active #cursor-dot{width:12px;height:12px}
-    body:has(a:hover,button:hover) #cursor-ring,
-    body.js-hover-active #cursor-ring{width:52px;height:52px;border-color:rgba(196,241,44,.8)}
-    @media(hover:none){#cursor-dot,#cursor-ring{display:none}}
 
     /* ═══════════════════════════════════════
        UTILITIES
@@ -534,16 +504,6 @@
     }
     @keyframes fadeUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
 
-    /* scroll indicator */
-    .scroll-hint{
-      position:absolute;bottom:32px;left:50%;transform:translateX(-50%);
-      z-index:2;display:flex;flex-direction:column;align-items:center;gap:8px;
-      opacity:0;animation:fadeUp .6s var(--ease) 1.8s forwards;
-    }
-    .scroll-hint-text{font-family:var(--font-mo);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--fg3)}
-    .scroll-mouse{width:22px;height:36px;border:1.5px solid rgba(196,241,44,.4);border-radius:12px;display:flex;justify-content:center;padding-top:6px}
-    .scroll-dot{width:4px;height:4px;background:var(--neon);border-radius:50%;animation:scrollDot 1.8s ease-in-out infinite;box-shadow:0 0 8px var(--neon-glow)}
-    @keyframes scrollDot{0%,100%{opacity:1;transform:translateY(0)}80%{opacity:0;transform:translateY(14px)}}
 
     /* ═══════════════════════════════════════
        LOGO BAR (trusted by)
@@ -1362,9 +1322,6 @@
 <!-- Skip to main content (a11y) -->
 <a href="#hero" class="skip-link">דלג לתוכן הראשי</a>
 
-<!-- Custom cursor -->
-<div id="cursor-dot" aria-hidden="true"></div>
-<div id="cursor-ring" aria-hidden="true"></div>
 
 <!-- ═══════════════════════════════════════
      NAVBAR
@@ -1974,10 +1931,6 @@
     </div>
   </div>
 
-  <div class="scroll-hint" aria-hidden="true">
-    <span class="scroll-hint-text">גלול למטה</span>
-    <div class="scroll-mouse"><div class="scroll-dot"></div></div>
-  </div>
 </section>
 
 <!-- ═══════════════════════════════════════
@@ -3040,36 +2993,6 @@ if(document.readyState === 'loading'){
 (function(){
   'use strict';
 
-  /* ─── Custom Cursor ─── */
-  const dot  = document.getElementById('cursor-dot');
-  const ring = document.getElementById('cursor-ring');
-  let mx=0,my=0,rx=0,ry=0;
-  const hasHover = window.matchMedia('(hover:hover)').matches;
-
-  if(hasHover){
-    document.addEventListener('mousemove', e=>{
-      mx=e.clientX; my=e.clientY;
-      dot.style.left=mx+'px'; dot.style.top=my+'px';
-      // hide cursor over form fields
-      const isField = e.target.matches('input,textarea,select,[contenteditable]');
-      dot.style.opacity  = isField ? '0' : '1';
-      ring.style.opacity = isField ? '0' : '1';
-    });
-    (function animRing(){
-      rx+=(mx-rx)*.12; ry+=(my-ry)*.12;
-      ring.style.left=rx+'px'; ring.style.top=ry+'px';
-      requestAnimationFrame(animRing);
-    })();
-
-    /* :has() fallback for Firefox < 121 */
-    if(!CSS.supports('selector(body:has(a))')){
-      const targets='a,button,.btn,[role="button"],.svc-card,.est-chip';
-      document.querySelectorAll(targets).forEach(el=>{
-        el.addEventListener('mouseenter',()=>document.body.classList.add('js-hover-active'));
-        el.addEventListener('mouseleave',()=>document.body.classList.remove('js-hover-active'));
-      });
-    }
-  }
 
   /* ─── Hero Canvas Particles ─── */
   const canvas = document.getElementById('hero-canvas');
