@@ -509,12 +509,7 @@
        LOGO BAR (trusted by)
     ═══════════════════════════════════════ */
     .logo-bar{
-      background:#0A0A0A;
-      padding:18px 0;
-      border-top:1px solid rgba(196,241,44,.06);
-      border-bottom:1px solid rgba(196,241,44,.06);
-      overflow:hidden;
-      position:relative;
+      display:none;
     }
     .logo-bar::before,.logo-bar::after{
       content:'';position:absolute;top:0;bottom:0;width:120px;z-index:2;pointer-events:none;
@@ -605,36 +600,26 @@
       width:5px;height:5px;background:var(--neon-h);border-radius:50%;
       flex-shrink:0;margin-top:6px;
     }
-    .svc-badge-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+    .svc-badge-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
     .svc-badge{
-      font-family:var(--font-mo);font-size:8.5px;letter-spacing:1.5px;
+      font-family:var(--font-mo);font-size:9.5px;letter-spacing:1.5px;
       text-transform:uppercase;border:1px solid rgba(196,241,44,.2);
-      color:rgba(196,241,44,.55);padding:5px 10px;
+      color:rgba(196,241,44,.55);padding:6px 12px;
+    }
+    /* Override for paper (light) sections — badges become dark */
+    .svc-section--paper .svc-badge{
+      border-color:rgba(10,10,10,.14);
+      color:rgba(10,10,10,.72);
+      background:rgba(10,10,10,.04);
     }
     .svc-vis{position:relative;min-height:360px;display:flex;align-items:center;justify-content:center}
 
-    /* ── Section 1: Training visual ── */
+    /* ── Section 1: Training visual (AI Workshop Console) ── */
     .train-svg{width:100%;max-width:480px;height:340px;display:block;overflow:visible}
-    .t-screen{fill:rgba(10,10,10,.04);stroke:rgba(10,10,10,.15);stroke-width:1.2}
-    .t-screen-hl{stroke:rgba(196,241,44,.25);stroke-width:.8;fill:none;stroke-dasharray:3 2}
-    .t-module{fill:#fff;stroke:var(--ink4);stroke-width:1}
-    .t-module-active{fill:rgba(196,241,44,.07);stroke:rgba(196,241,44,.35);stroke-width:1.2}
-    .t-module-text{font-family:'JetBrains Mono',monospace;font-size:7px;fill:rgba(10,10,10,.4);letter-spacing:.5px}
-    .t-module-label{font-family:'JetBrains Mono',monospace;font-size:6.5px;fill:rgba(196,241,44,.7);letter-spacing:1px;text-transform:uppercase}
-    .t-beam{stroke:rgba(196,241,44,.07);stroke-width:14;fill:none;stroke-linecap:round}
-    .t-beam-line{stroke:rgba(196,241,44,.18);stroke-width:.8;fill:none;stroke-dasharray:4 3}
-    .t-person-head{fill:none;stroke:rgba(10,10,10,.3);stroke-width:1.2}
-    .t-person-body{stroke:rgba(10,10,10,.18);stroke-width:1.2;fill:none;stroke-linecap:round}
-    .t-person-neon{stroke:rgba(196,241,44,.6);stroke-width:1.4;fill:none}
-    .t-check{stroke:var(--neon-h);stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
-    .t-progress-bg{stroke:rgba(10,10,10,.08);stroke-width:2.5;fill:none;stroke-linecap:round}
-    .t-progress{stroke:var(--neon-h);stroke-width:2.5;fill:none;stroke-linecap:round}
-    .t-tag{fill:var(--paper);stroke:rgba(196,241,44,.25);stroke-width:.8}
-    .t-tag-text{font-family:'JetBrains Mono',monospace;font-size:7px;fill:rgba(196,241,44,.7);letter-spacing:.8px}
-    @keyframes tFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
-    .t-float{animation:tFloat 3.5s ease-in-out infinite}
-    .t-float2{animation:tFloat 4s ease-in-out infinite .6s}
-    .t-float3{animation:tFloat 3s ease-in-out infinite 1.2s}
+    @keyframes tvisPulse{0%,100%{opacity:.35}50%{opacity:1}}
+    @keyframes tvisFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+    @keyframes tvisEkg{from{stroke-dashoffset:120}to{stroke-dashoffset:-120}}
+    @keyframes tvisDrop{to{stroke-dashoffset:-16}}
 
     /* ── Section 2: Automation node network ── */
     .auto-svg{width:100%;height:340px;display:block;overflow:visible}
@@ -1982,149 +1967,300 @@
 
       <!-- Visual (left col in RTL) -->
       <div class="svc-vis reveal" style="transition-delay:.15s" aria-hidden="true">
-        <svg class="train-svg" viewBox="0 0 480 340" role="img" aria-label="אילוסטרציה של סדנת הדרכה">
-
-          <!-- background glow -->
+        <svg class="train-svg" viewBox="0 0 480 340" role="img" aria-label="AI Workshop dashboard visualization">
           <defs>
-            <radialGradient id="tGlow" cx="50%" cy="45%" r="50%">
-              <stop offset="0%" stop-color="rgba(196,241,44,.06)"/>
+            <!-- Subtle dot grid pattern -->
+            <pattern id="tDots" width="18" height="18" patternUnits="userSpaceOnUse">
+              <circle cx="9" cy="9" r=".9" fill="rgba(10,10,10,.07)"/>
+            </pattern>
+            <!-- Particle drop paths (model cards → skills bar) -->
+            <path id="td1" d="M101,124 Q101,142 101,158"/>
+            <path id="td2" d="M240,124 Q240,142 240,158"/>
+            <path id="td3" d="M379,124 Q379,142 379,158"/>
+            <!-- Soft inner glow for panel -->
+            <linearGradient id="tPGlow" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="rgba(196,241,44,.04)"/>
               <stop offset="100%" stop-color="rgba(196,241,44,0)"/>
-            </radialGradient>
-            <path id="tb1" d="M240,200 Q200,160 160,130"/>
-            <path id="tb2" d="M240,200 Q240,155 240,120"/>
-            <path id="tb3" d="M240,200 Q280,160 320,130"/>
-            <path id="tb4" d="M240,200 Q170,170 120,155"/>
-            <path id="tb5" d="M240,200 Q310,170 360,155"/>
+            </linearGradient>
           </defs>
-          <rect x="0" y="0" width="480" height="340" fill="url(#tGlow)"/>
 
-          <!-- Curriculum board -->
-          <rect x="60" y="18" width="360" height="148" rx="0" class="t-screen"/>
-          <line x1="60" y1="40" x2="420" y2="40" class="t-screen-hl"/>
-          <!-- board title -->
-          <text x="76" y="33" class="t-module-text" style="font-size:8px;fill:rgba(10,10,10,.3);letter-spacing:2px">CLICK AI CURRICULUM</text>
-          <rect x="420" y="22" width="24" height="14" rx="0" class="t-module-active"/>
-          <text x="432" y="31" class="t-module-label" style="text-anchor:middle">LIVE</text>
+          <!-- Dot-grid canvas background -->
+          <rect width="480" height="340" fill="url(#tDots)"/>
 
-          <!-- Module grid: row 1 -->
-          <rect x="76"  y="50" width="96" height="44" class="t-module-active"/>
-          <text x="88"  y="65" class="t-module-label">MODULE 01</text>
-          <text x="88"  y="78" class="t-module-text">ChatGPT Basics</text>
-          <polyline points="96,86 102,92 112,82" class="t-check"/>
+          <!-- ═══ MAIN DARK PANEL ═══ -->
+          <rect x="22" y="8" width="436" height="220" rx="10"
+                fill="rgba(10,10,10,.92)"
+                style="filter:drop-shadow(0 14px 36px rgba(0,0,0,.22))"/>
+          <!-- panel inner gradient -->
+          <rect x="22" y="8" width="436" height="220" rx="10" fill="url(#tPGlow)"/>
+          <!-- panel border -->
+          <rect x="22" y="8" width="436" height="220" rx="10" fill="none"
+                stroke="rgba(196,241,44,.14)" stroke-width="1"/>
 
-          <rect x="182" y="50" width="96" height="44" class="t-module-active"/>
-          <text x="194" y="65" class="t-module-label">MODULE 02</text>
-          <text x="194" y="78" class="t-module-text">Prompt Engineering</text>
-          <polyline points="202,86 208,92 218,82" class="t-check"/>
+          <!-- Panel header bar -->
+          <rect x="22" y="8" width="436" height="30" rx="10" fill="rgba(255,255,255,.025)"/>
+          <rect x="22" y="30" width="436" height="8" fill="rgba(0,0,0,.25)"/>
+          <!-- macOS-style window dots -->
+          <circle cx="42"  cy="23" r="4.5" fill="rgba(255,80,80,.6)"/>
+          <circle cx="56"  cy="23" r="4.5" fill="rgba(255,185,0,.6)"/>
+          <circle cx="70"  cy="23" r="4.5" fill="rgba(65,200,65,.45)"/>
+          <!-- Header label -->
+          <text x="240" y="26.5" text-anchor="middle"
+                font-family="'JetBrains Mono',monospace" font-size="7.5"
+                fill="rgba(196,241,44,.5)" letter-spacing="2.5">AI WORKSHOP CONSOLE</text>
+          <!-- Live dot -->
+          <circle cx="434" cy="23" r="4"
+                  fill="#C4F12C" style="animation:tvisPulse 1.6s ease-in-out infinite"/>
+          <text x="428" y="26.5" text-anchor="end"
+                font-family="'JetBrains Mono',monospace" font-size="7"
+                fill="rgba(196,241,44,.55)" letter-spacing="1">LIVE</text>
 
-          <rect x="288" y="50" width="96" height="44" class="t-module"/>
-          <text x="300" y="65" class="t-module-label" style="fill:rgba(10,10,10,.25)">MODULE 03</text>
-          <text x="300" y="78" class="t-module-text">AI for Workflows</text>
-          <!-- progress bar module 3 -->
-          <line x1="302" y1="87" x2="374" y2="87" class="t-progress-bg"/>
-          <line x1="302" y1="87" x2="344" y2="87" class="t-progress"/>
+          <!-- ═══ 3 AI MODEL CARDS ═══ -->
 
-          <!-- Module grid: row 2 -->
-          <rect x="76"  y="104" width="96" height="44" class="t-module"/>
-          <text x="88"  y="119" class="t-module-label" style="fill:rgba(10,10,10,.2)">MODULE 04</text>
-          <text x="88"  y="132" class="t-module-text">Automation AI</text>
-          <line x1="90" y1="141" x2="162" y2="141" class="t-progress-bg"/>
-          <line x1="90" y1="141" x2="117" y2="141" class="t-progress" style="stroke:rgba(196,241,44,.35)"/>
+          <!-- ── Card: Claude ── -->
+          <rect x="34" y="48" width="126" height="72" rx="6"
+                fill="rgba(196,241,44,.045)" stroke="rgba(196,241,44,.22)" stroke-width="1"/>
+          <!-- Claude icon -->
+          <circle cx="64" cy="70" r="13" fill="rgba(196,241,44,.1)"
+                  stroke="rgba(196,241,44,.35)" stroke-width="1.2"/>
+          <text x="64" y="75" text-anchor="middle"
+                font-family="'JetBrains Mono',monospace" font-size="11" font-weight="700"
+                fill="rgba(196,241,44,.95)">C</text>
+          <!-- Claude name + status -->
+          <text x="85" y="67"
+                font-family="'JetBrains Mono',monospace" font-size="9.5" font-weight="700"
+                fill="rgba(250,250,247,.92)">Claude</text>
+          <circle cx="85" cy="75" r="3"
+                  fill="#C4F12C" style="animation:tvisPulse 2s ease-in-out infinite;animation-delay:.15s"/>
+          <text x="91" y="78"
+                font-family="'JetBrains Mono',monospace" font-size="6.5"
+                fill="rgba(250,250,247,.35)" letter-spacing=".5">ACTIVE</text>
+          <!-- Claude EKG line -->
+          <polyline points="36,103 50,103 55,95 61,111 66,99 71,107 76,102 82,103 88,96 94,103 100,103 114,103 126,103 152,103"
+                    fill="none" stroke="rgba(196,241,44,.45)" stroke-width="1.2"
+                    stroke-dasharray="116" stroke-dashoffset="116">
+            <animate attributeName="stroke-dashoffset" from="116" to="-116"
+                     dur="2.6s" repeatCount="indefinite"/>
+          </polyline>
+          <!-- Claude context chip -->
+          <text x="34" y="115"
+                font-family="'JetBrains Mono',monospace" font-size="6"
+                fill="rgba(250,250,247,.22)" letter-spacing="1">200K CTX · REASON</text>
 
-          <rect x="182" y="104" width="96" height="44" class="t-module"/>
-          <text x="194" y="119" class="t-module-label" style="fill:rgba(10,10,10,.2)">MODULE 05</text>
-          <text x="194" y="132" class="t-module-text">AI + CRM</text>
-          <line x1="196" y1="141" x2="268" y2="141" class="t-progress-bg"/>
+          <!-- ── Card: GPT-4o ── -->
+          <rect x="177" y="48" width="126" height="72" rx="6"
+                fill="rgba(255,255,255,.03)" stroke="rgba(255,255,255,.1)" stroke-width="1"/>
+          <circle cx="207" cy="70" r="13" fill="rgba(255,255,255,.06)"
+                  stroke="rgba(255,255,255,.15)" stroke-width="1.2"/>
+          <text x="207" y="75" text-anchor="middle"
+                font-family="'JetBrains Mono',monospace" font-size="11" font-weight="700"
+                fill="rgba(250,250,247,.8)">G</text>
+          <text x="228" y="67"
+                font-family="'JetBrains Mono',monospace" font-size="9.5" font-weight="700"
+                fill="rgba(250,250,247,.92)">GPT-4o</text>
+          <circle cx="228" cy="75" r="3"
+                  fill="rgba(196,241,44,.6)" style="animation:tvisPulse 2.2s ease-in-out infinite;animation-delay:.7s"/>
+          <text x="234" y="78"
+                font-family="'JetBrains Mono',monospace" font-size="6.5"
+                fill="rgba(250,250,247,.35)" letter-spacing=".5">READY</text>
+          <polyline points="179,103 190,103 196,96 202,110 207,98 213,106 218,101 224,103 230,96 236,103 242,103 253,103 265,103 295,103"
+                    fill="none" stroke="rgba(255,255,255,.22)" stroke-width="1.2"
+                    stroke-dasharray="116" stroke-dashoffset="116">
+            <animate attributeName="stroke-dashoffset" from="116" to="-116"
+                     dur="3.1s" repeatCount="indefinite" begin=".9s"/>
+          </polyline>
+          <text x="177" y="115"
+                font-family="'JetBrains Mono',monospace" font-size="6"
+                fill="rgba(250,250,247,.22)" letter-spacing="1">128K CTX · VISION</text>
 
-          <rect x="288" y="104" width="96" height="44" class="t-module"/>
-          <text x="300" y="119" class="t-module-label" style="fill:rgba(10,10,10,.2)">MODULE 06</text>
-          <text x="300" y="132" class="t-module-text">Measurement</text>
+          <!-- ── Card: Gemini ── -->
+          <rect x="320" y="48" width="126" height="72" rx="6"
+                fill="rgba(255,255,255,.03)" stroke="rgba(255,255,255,.1)" stroke-width="1"/>
+          <circle cx="350" cy="70" r="13" fill="rgba(255,255,255,.06)"
+                  stroke="rgba(255,255,255,.15)" stroke-width="1.2"/>
+          <text x="350" y="75" text-anchor="middle"
+                font-family="'JetBrains Mono',monospace" font-size="10" font-weight="700"
+                fill="rgba(250,250,247,.8)">Gm</text>
+          <text x="371" y="67"
+                font-family="'JetBrains Mono',monospace" font-size="9.5" font-weight="700"
+                fill="rgba(250,250,247,.92)">Gemini</text>
+          <circle cx="371" cy="75" r="3"
+                  fill="rgba(196,241,44,.45)" style="animation:tvisPulse 2s ease-in-out infinite;animation-delay:1.3s"/>
+          <text x="377" y="78"
+                font-family="'JetBrains Mono',monospace" font-size="6.5"
+                fill="rgba(250,250,247,.35)" letter-spacing=".5">ACTIVE</text>
+          <polyline points="322,103 332,103 338,96 344,109 350,97 355,105 361,101 367,103 373,96 379,103 385,103 396,103 410,103 440,103"
+                    fill="none" stroke="rgba(255,255,255,.22)" stroke-width="1.2"
+                    stroke-dasharray="118" stroke-dashoffset="118">
+            <animate attributeName="stroke-dashoffset" from="118" to="-118"
+                     dur="2.8s" repeatCount="indefinite" begin="1.5s"/>
+          </polyline>
+          <text x="320" y="115"
+                font-family="'JetBrains Mono',monospace" font-size="6"
+                fill="rgba(250,250,247,.22)" letter-spacing="1">1M CTX · MULTIMODAL</text>
 
-          <!-- beam light (soft glow from screen to trainer) -->
-          <path d="M150,166 L200,210" class="t-beam"/>
-          <path d="M240,166 L240,205" class="t-beam"/>
-          <path d="M330,166 L280,210" class="t-beam"/>
+          <!-- Divider + section label -->
+          <line x1="34" y1="133" x2="446" y2="133"
+                stroke="rgba(196,241,44,.09)" stroke-width="1"/>
 
-          <!-- Instructor figure -->
-          <circle cx="240" cy="218" r="14" class="t-person-neon"/>
-          <line x1="240" y1="232" x2="240" y2="265" class="t-person-neon" stroke-width="2"/>
-          <line x1="216" y1="248" x2="264" y2="248" class="t-person-neon" stroke-width="1.8"/>
-          <line x1="240" y1="265" x2="224" y2="290" class="t-person-neon" stroke-width="1.8"/>
-          <line x1="240" y1="265" x2="256" y2="290" class="t-person-neon" stroke-width="1.8"/>
+          <!-- Animated vertical data-drop pipes -->
+          <line x1="97" y1="122" x2="97" y2="152"
+                stroke="rgba(196,241,44,.18)" stroke-width="1"
+                stroke-dasharray="3 4">
+            <animate attributeName="stroke-dashoffset" from="0" to="-14"
+                     dur="1s" repeatCount="indefinite"/>
+          </line>
+          <line x1="240" y1="122" x2="240" y2="152"
+                stroke="rgba(196,241,44,.18)" stroke-width="1"
+                stroke-dasharray="3 4">
+            <animate attributeName="stroke-dashoffset" from="0" to="-14"
+                     dur="1.2s" repeatCount="indefinite"/>
+          </line>
+          <line x1="383" y1="122" x2="383" y2="152"
+                stroke="rgba(196,241,44,.18)" stroke-width="1"
+                stroke-dasharray="3 4">
+            <animate attributeName="stroke-dashoffset" from="0" to="-14"
+                     dur=".9s" repeatCount="indefinite"/>
+          </line>
 
-          <!-- beam lines to students -->
-          <path d="M225,230 Q200,248 168,252" class="t-beam-line"/>
-          <path d="M240,232 Q240,252 240,260" class="t-beam-line"/>
-          <path d="M255,230 Q278,248 312,252" class="t-beam-line"/>
-          <path d="M220,235 Q182,252 148,262" class="t-beam-line" style="opacity:.5"/>
-          <path d="M260,235 Q298,252 332,262" class="t-beam-line" style="opacity:.5"/>
-
-          <!-- Student figures: 5 students -->
-          <g class="t-float">
-            <circle cx="130" cy="278" r="9" class="t-person-head"/>
-            <line x1="130" y1="287" x2="130" y2="308" class="t-person-body"/>
-            <line x1="115" y1="295" x2="145" y2="295" class="t-person-body"/>
-          </g>
-          <g class="t-float2">
-            <circle cx="178" cy="272" r="9" class="t-person-head"/>
-            <line x1="178" y1="281" x2="178" y2="302" class="t-person-body"/>
-            <line x1="163" y1="289" x2="193" y2="289" class="t-person-body"/>
-          </g>
-          <g>
-            <circle cx="240" cy="278" r="9" class="t-person-head"/>
-            <line x1="240" y1="287" x2="240" y2="308" class="t-person-body"/>
-            <line x1="225" y1="295" x2="255" y2="295" class="t-person-body"/>
-          </g>
-          <g class="t-float3">
-            <circle cx="302" cy="272" r="9" class="t-person-head"/>
-            <line x1="302" y1="281" x2="302" y2="302" class="t-person-body"/>
-            <line x1="287" y1="289" x2="317" y2="289" class="t-person-body"/>
-          </g>
-          <g class="t-float">
-            <circle cx="350" cy="278" r="9" class="t-person-head"/>
-            <line x1="350" y1="287" x2="350" y2="308" class="t-person-body"/>
-            <line x1="335" y1="295" x2="365" y2="295" class="t-person-body"/>
-          </g>
-
-          <!-- Animated knowledge particles from instructor to students -->
+          <!-- Neon particle dots flowing down the pipes -->
           <circle r="2.2" fill="#C4F12C" opacity="0">
-            <animateMotion dur="1.8s" repeatCount="indefinite" begin="0s"><mpath href="#tb1"/></animateMotion>
-            <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.1;.9;1" dur="1.8s" repeatCount="indefinite"/>
+            <animateMotion dur="1.3s" repeatCount="indefinite" begin="0s"><mpath href="#td1"/></animateMotion>
+            <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.1;.88;1"
+                     dur="1.3s" repeatCount="indefinite"/>
           </circle>
           <circle r="2.2" fill="#C4F12C" opacity="0">
-            <animateMotion dur="1.6s" repeatCount="indefinite" begin=".4s"><mpath href="#tb2"/></animateMotion>
-            <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.1;.9;1" dur="1.6s" repeatCount="indefinite" begin=".4s"/>
+            <animateMotion dur="1.5s" repeatCount="indefinite" begin=".5s"><mpath href="#td2"/></animateMotion>
+            <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.1;.88;1"
+                     dur="1.5s" repeatCount="indefinite" begin=".5s"/>
           </circle>
           <circle r="2.2" fill="#C4F12C" opacity="0">
-            <animateMotion dur="1.9s" repeatCount="indefinite" begin=".8s"><mpath href="#tb3"/></animateMotion>
-            <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.1;.9;1" dur="1.9s" repeatCount="indefinite" begin=".8s"/>
-          </circle>
-          <circle r="1.8" fill="#A4D612" opacity="0">
-            <animateMotion dur="2.2s" repeatCount="indefinite" begin="1.1s"><mpath href="#tb4"/></animateMotion>
-            <animate attributeName="opacity" values="0;.7;.7;0" keyTimes="0;.1;.9;1" dur="2.2s" repeatCount="indefinite" begin="1.1s"/>
-          </circle>
-          <circle r="1.8" fill="#A4D612" opacity="0">
-            <animateMotion dur="2s" repeatCount="indefinite" begin="1.5s"><mpath href="#tb5"/></animateMotion>
-            <animate attributeName="opacity" values="0;.7;.7;0" keyTimes="0;.1;.9;1" dur="2s" repeatCount="indefinite" begin="1.5s"/>
+            <animateMotion dur="1.2s" repeatCount="indefinite" begin="1s"><mpath href="#td3"/></animateMotion>
+            <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.1;.88;1"
+                     dur="1.2s" repeatCount="indefinite" begin="1s"/>
           </circle>
 
-          <!-- Floating tool tags -->
-          <g class="t-float" style="animation-duration:4s">
-            <rect x="22" y="120" width="54" height="18" class="t-tag"/>
-            <text x="49" y="131" class="t-tag-text" style="text-anchor:middle">GPT-4o</text>
+          <!-- ═══ SKILL ACQUISITION BAR ═══ -->
+          <text x="34" y="164"
+                font-family="'JetBrains Mono',monospace" font-size="7"
+                fill="rgba(250,250,247,.28)" letter-spacing="2.5">SKILL ACQUISITION</text>
+          <text x="446" y="164" text-anchor="end"
+                font-family="'JetBrains Mono',monospace" font-size="7"
+                fill="rgba(196,241,44,.45)" letter-spacing="1">PROGRESS</text>
+
+          <!-- Bar 1: Prompt Design -->
+          <text x="34" y="181"
+                font-family="'JetBrains Mono',monospace" font-size="7"
+                fill="rgba(250,250,247,.42)" letter-spacing="1">PROMPT DESIGN</text>
+          <text x="446" y="181" text-anchor="end"
+                font-family="'JetBrains Mono',monospace" font-size="7"
+                fill="rgba(196,241,44,.8)">88%</text>
+          <rect x="34" y="184" width="320" height="4" rx="2"
+                fill="rgba(255,255,255,.07)"/>
+          <rect x="34" y="184" height="4" rx="2"
+                fill="rgba(196,241,44,.72)" width="0">
+            <animate attributeName="width" from="0" to="282" dur="1.4s" begin="0.3s" fill="freeze"/>
+          </rect>
+
+          <!-- Bar 2: AI Strategy -->
+          <text x="34" y="201"
+                font-family="'JetBrains Mono',monospace" font-size="7"
+                fill="rgba(250,250,247,.42)" letter-spacing="1">AI STRATEGY</text>
+          <text x="446" y="201" text-anchor="end"
+                font-family="'JetBrains Mono',monospace" font-size="7"
+                fill="rgba(196,241,44,.8)">74%</text>
+          <rect x="34" y="204" width="320" height="4" rx="2"
+                fill="rgba(255,255,255,.07)"/>
+          <rect x="34" y="204" height="4" rx="2"
+                fill="rgba(196,241,44,.52)" width="0">
+            <animate attributeName="width" from="0" to="237" dur="1.4s" begin="0.55s" fill="freeze"/>
+          </rect>
+
+          <!-- Bar 3: Automation -->
+          <text x="34" y="221"
+                font-family="'JetBrains Mono',monospace" font-size="7"
+                fill="rgba(250,250,247,.42)" letter-spacing="1">WORKFLOW AUTO.</text>
+          <text x="446" y="221" text-anchor="end"
+                font-family="'JetBrains Mono',monospace" font-size="7"
+                fill="rgba(196,241,44,.8)">82%</text>
+          <rect x="34" y="224" width="320" height="4" rx="2"
+                fill="rgba(255,255,255,.07)"/>
+          <rect x="34" y="224" height="4" rx="2"
+                fill="rgba(196,241,44,.62)" width="0">
+            <animate attributeName="width" from="0" to="262" dur="1.4s" begin="0.8s" fill="freeze"/>
+          </rect>
+
+          <!-- ═══ FLOATING OUTCOME CHIPS (below panel) ═══ -->
+          <!-- Chip 1 -->
+          <g style="animation:tvisFloat 4.2s ease-in-out infinite">
+            <rect x="22" y="242" width="134" height="32" rx="5"
+                  fill="white" stroke="rgba(10,10,10,.08)" stroke-width="1"
+                  style="filter:drop-shadow(0 3px 10px rgba(0,0,0,.07))"/>
+            <circle cx="45" cy="258" r="9" fill="rgba(196,241,44,.1)"/>
+            <text x="45" y="262" text-anchor="middle"
+                  font-family="'JetBrains Mono',monospace" font-size="9"
+                  fill="rgba(10,10,10,.55)">✓</text>
+            <text x="60" y="254"
+                  font-family="'JetBrains Mono',monospace" font-size="7.5"
+                  fill="rgba(10,10,10,.72)" letter-spacing=".5">LIVE WORKSHOPS</text>
+            <text x="60" y="265"
+                  font-family="'JetBrains Mono',monospace" font-size="6.5"
+                  fill="rgba(10,10,10,.32)">Per Dept.</text>
           </g>
-          <g class="t-float2" style="animation-duration:3.8s">
-            <rect x="404" y="108" width="52" height="18" class="t-tag"/>
-            <text x="430" y="119" class="t-tag-text" style="text-anchor:middle">Claude</text>
+
+          <!-- Chip 2 -->
+          <g style="animation:tvisFloat 4.8s ease-in-out infinite;animation-delay:1.4s">
+            <rect x="173" y="242" width="134" height="32" rx="5"
+                  fill="white" stroke="rgba(10,10,10,.08)" stroke-width="1"
+                  style="filter:drop-shadow(0 3px 10px rgba(0,0,0,.07))"/>
+            <circle cx="196" cy="258" r="9" fill="rgba(196,241,44,.1)"/>
+            <text x="196" y="262" text-anchor="middle"
+                  font-family="'JetBrains Mono',monospace" font-size="9"
+                  fill="rgba(10,10,10,.55)">↑</text>
+            <text x="211" y="254"
+                  font-family="'JetBrains Mono',monospace" font-size="7.5"
+                  fill="rgba(10,10,10,.72)" letter-spacing=".5">40% EFFICIENCY</text>
+            <text x="211" y="265"
+                  font-family="'JetBrains Mono',monospace" font-size="6.5"
+                  fill="rgba(10,10,10,.32)">Avg. improvement</text>
           </g>
-          <g class="t-float3" style="animation-duration:4.2s">
-            <rect x="22" y="192" width="54" height="18" class="t-tag"/>
-            <text x="49" y="203" class="t-tag-text" style="text-anchor:middle">Gemini</text>
+
+          <!-- Chip 3 -->
+          <g style="animation:tvisFloat 5.2s ease-in-out infinite;animation-delay:2.8s">
+            <rect x="324" y="242" width="134" height="32" rx="5"
+                  fill="white" stroke="rgba(10,10,10,.08)" stroke-width="1"
+                  style="filter:drop-shadow(0 3px 10px rgba(0,0,0,.07))"/>
+            <circle cx="347" cy="258" r="9" fill="rgba(196,241,44,.1)"/>
+            <text x="347" y="262" text-anchor="middle"
+                  font-family="'JetBrains Mono',monospace" font-size="9"
+                  fill="rgba(10,10,10,.55)">✦</text>
+            <text x="362" y="254"
+                  font-family="'JetBrains Mono',monospace" font-size="7.5"
+                  fill="rgba(10,10,10,.72)" letter-spacing=".5">AI STRATEGY</text>
+            <text x="362" y="265"
+                  font-family="'JetBrains Mono',monospace" font-size="6.5"
+                  fill="rgba(10,10,10,.32)">C-Level advisory</text>
           </g>
-          <g class="t-float" style="animation-duration:3.6s;animation-delay:.9s">
-            <rect x="404" y="180" width="56" height="18" class="t-tag"/>
-            <text x="432" y="191" class="t-tag-text" style="text-anchor:middle">Perplexity</text>
-          </g>
+
+          <!-- ═══ BOTTOM TOOL ROW ═══ -->
+          <rect x="22" y="288" width="436" height="44" rx="6"
+                fill="rgba(10,10,10,.04)" stroke="rgba(10,10,10,.06)" stroke-width="1"/>
+          <text x="240" y="302" text-anchor="middle"
+                font-family="'JetBrains Mono',monospace" font-size="6.5"
+                fill="rgba(10,10,10,.28)" letter-spacing="2.5">INTEGRATED TOOLS</text>
+          <!-- Tool name chips -->
+          <rect x="36"  y="308" width="52" height="16" rx="3" fill="rgba(10,10,10,.05)" stroke="rgba(10,10,10,.08)" stroke-width=".8"/>
+          <text x="62"  y="319" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="7" fill="rgba(10,10,10,.55)">n8n</text>
+          <rect x="96"  y="308" width="52" height="16" rx="3" fill="rgba(10,10,10,.05)" stroke="rgba(10,10,10,.08)" stroke-width=".8"/>
+          <text x="122" y="319" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="7" fill="rgba(10,10,10,.55)">Zapier</text>
+          <rect x="156" y="308" width="68" height="16" rx="3" fill="rgba(10,10,10,.05)" stroke="rgba(10,10,10,.08)" stroke-width=".8"/>
+          <text x="190" y="319" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="7" fill="rgba(10,10,10,.55)">HubSpot</text>
+          <rect x="232" y="308" width="72" height="16" rx="3" fill="rgba(10,10,10,.05)" stroke="rgba(10,10,10,.08)" stroke-width=".8"/>
+          <text x="268" y="319" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="7" fill="rgba(10,10,10,.55)">Perplexity</text>
+          <rect x="312" y="308" width="68" height="16" rx="3" fill="rgba(10,10,10,.05)" stroke="rgba(10,10,10,.08)" stroke-width=".8"/>
+          <text x="346" y="319" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="7" fill="rgba(10,10,10,.55)">Make.com</text>
+          <rect x="388" y="308" width="60" height="16" rx="3" fill="rgba(196,241,44,.08)" stroke="rgba(196,241,44,.2)" stroke-width=".8"/>
+          <text x="418" y="319" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="7" fill="rgba(10,10,10,.65)">+20 more</text>
 
         </svg>
       </div>
