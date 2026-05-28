@@ -241,9 +241,19 @@
     .hero-bg-net{
       position:absolute;inset:0;width:100%;height:100%;
       pointer-events:none;z-index:1;
-      opacity:.85; /* slight dim so it doesn't overpower particles */
+      opacity:1;
     }
-    @media(prefers-reduced-motion:reduce){.hero-bg-net circle[r="2"],.hero-bg-net circle[r="1.8"]{display:none}}
+    /* gentle pulse for AI hub */
+    @keyframes hubPulse{0%,100%{opacity:.55}50%{opacity:1}}
+    @keyframes hubGlow{0%,100%{opacity:.45}50%{opacity:1}}
+    .hbn-hub-ring{animation:hubPulse 4s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+    .hbn-hub-glow{animation:hubGlow 4s ease-in-out infinite}
+    @media(prefers-reduced-motion:reduce){
+      .hero-bg-net .bg-flow{display:none}
+      .hbn-hub-ring,.hbn-hub-glow{animation:none}
+    }
+    /* dim background icons on small screens so they don't crowd mobile hero */
+    @media(max-width:760px){.hero-bg-net{opacity:.55}}
 
     /* gradient mesh */
     .hero-mesh{
@@ -1241,103 +1251,234 @@
 <section class="hero" id="hero">
   <canvas id="hero-canvas" aria-hidden="true"></canvas>
 
-  <!-- Atmospheric background: automation network + interface wireframes at very low opacity -->
+  <!-- Atmospheric background: AI agent network with recognizable system icons -->
   <svg class="hero-bg-net" viewBox="0 0 1440 700" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
     <defs>
-      <!-- flow paths for animated particles -->
-      <path id="hbn1" d="M180,120 Q320,200 480,180"/>
-      <path id="hbn2" d="M480,180 Q640,160 780,240"/>
-      <path id="hbn3" d="M780,240 Q900,310 1060,290"/>
-      <path id="hbn4" d="M1060,290 Q1180,260 1300,340"/>
-      <path id="hbn5" d="M280,380 Q440,340 600,400"/>
-      <path id="hbn6" d="M600,400 Q760,460 920,420"/>
-      <path id="hbn7" d="M140,500 Q300,480 460,540"/>
-      <path id="hbn8" d="M920,120 Q1040,80 1160,150"/>
-      <path id="hbn9" d="M1060,290 Q980,400 920,420"/>
+      <!-- Flow paths between AI hub and connected systems -->
+      <path id="hbn-wa-ai"   d="M165,115 Q255,150 345,200"/>     <!-- WhatsApp → AI -->
+      <path id="hbn-em-ai"   d="M575,105 Q470,140 345,200"/>     <!-- Email → AI -->
+      <path id="hbn-crm-ai"  d="M140,395 Q235,290 345,200"/>     <!-- CRM → AI -->
+      <path id="hbn-ai-db"   d="M345,200 Q520,235 695,285"/>     <!-- AI → Database -->
+      <path id="hbn-db-ag2"  d="M695,285 Q800,375 880,460"/>     <!-- DB → Agent_02 -->
+      <path id="hbn-ai-bk"   d="M345,200 Q395,360 410,520"/>     <!-- AI → Book -->
+      <path id="hbn-bk-ag2"  d="M410,520 Q645,505 880,460"/>     <!-- Book → Agent_02 -->
+      <path id="hbn-ag2-r"   d="M880,460 Q1040,415 1185,375"/>   <!-- Agent_02 → right node -->
+      <path id="hbn-em-tr"   d="M575,105 Q830,55 1085,125"/>     <!-- Email → top-right -->
+      <path id="hbn-crm-ag2" d="M140,395 Q500,560 880,460"/>     <!-- CRM → Agent_02 (long) -->
+      <path id="hbn-ai-ag2"  d="M345,200 Q615,330 880,460"/>     <!-- AI → Agent_02 (cross) -->
     </defs>
 
-    <!-- automation network nodes -->
-    <circle cx="180" cy="120" r="5" fill="none" stroke="rgba(196,241,44,.12)" stroke-width="1"/>
-    <circle cx="180" cy="120" r="2" fill="rgba(196,241,44,.15)"/>
-    <circle cx="480" cy="180" r="6" fill="none" stroke="rgba(196,241,44,.14)" stroke-width="1"/>
-    <circle cx="480" cy="180" r="2.5" fill="rgba(196,241,44,.18)"/>
-    <circle cx="780" cy="240" r="5" fill="none" stroke="rgba(196,241,44,.10)" stroke-width="1"/>
-    <circle cx="780" cy="240" r="2" fill="rgba(196,241,44,.12)"/>
-    <circle cx="1060" cy="290" r="7" fill="none" stroke="rgba(196,241,44,.18)" stroke-width="1.2"/>
-    <circle cx="1060" cy="290" r="3" fill="rgba(196,241,44,.22)"/>
-    <circle cx="1300" cy="340" r="5" fill="none" stroke="rgba(196,241,44,.10)" stroke-width="1"/>
-    <circle cx="280" cy="380" r="5" fill="none" stroke="rgba(196,241,44,.10)" stroke-width="1"/>
-    <circle cx="600" cy="400" r="6" fill="none" stroke="rgba(196,241,44,.13)" stroke-width="1"/>
-    <circle cx="920" cy="420" r="6" fill="none" stroke="rgba(196,241,44,.13)" stroke-width="1"/>
-    <circle cx="140" cy="500" r="4" fill="none" stroke="rgba(196,241,44,.08)" stroke-width="1"/>
-    <circle cx="920" cy="120" r="5" fill="none" stroke="rgba(196,241,44,.12)" stroke-width="1"/>
-    <circle cx="1160" cy="150" r="5" fill="none" stroke="rgba(196,241,44,.12)" stroke-width="1"/>
+    <!-- ─── Network connection edges (dashed) ─── -->
+    <g fill="none" stroke="rgba(196,241,44,.16)" stroke-width="1" stroke-dasharray="4 5">
+      <path d="M165,115 Q255,150 345,200"/>
+      <path d="M575,105 Q470,140 345,200"/>
+      <path d="M140,395 Q235,290 345,200"/>
+      <path d="M345,200 Q520,235 695,285"/>
+      <path d="M695,285 Q800,375 880,460"/>
+      <path d="M345,200 Q395,360 410,520"/>
+      <path d="M410,520 Q645,505 880,460"/>
+      <path d="M880,460 Q1040,415 1185,375"/>
+    </g>
+    <g fill="none" stroke="rgba(196,241,44,.09)" stroke-width=".8" stroke-dasharray="3 6">
+      <path d="M575,105 Q830,55 1085,125"/>
+      <path d="M140,395 Q500,560 880,460"/>
+      <path d="M345,200 Q615,330 880,460"/>
+      <path d="M1085,125 Q1140,250 1185,375"/>
+    </g>
+    <!-- faint long diagonals for depth -->
+    <g fill="none" stroke="rgba(196,241,44,.05)" stroke-width=".6">
+      <path d="M165,115 Q580,400 1185,375"/>
+      <path d="M1085,125 Q700,450 410,520"/>
+    </g>
 
-    <!-- connection edges -->
-    <path d="M180,120 Q320,200 480,180" fill="none" stroke="rgba(196,241,44,.07)" stroke-width=".8" stroke-dasharray="5 5"/>
-    <path d="M480,180 Q640,160 780,240" fill="none" stroke="rgba(196,241,44,.07)" stroke-width=".8" stroke-dasharray="5 5"/>
-    <path d="M780,240 Q900,310 1060,290" fill="none" stroke="rgba(196,241,44,.07)" stroke-width=".8" stroke-dasharray="5 5"/>
-    <path d="M1060,290 Q1180,260 1300,340" fill="none" stroke="rgba(196,241,44,.06)" stroke-width=".8" stroke-dasharray="5 5"/>
-    <path d="M280,380 Q440,340 600,400" fill="none" stroke="rgba(196,241,44,.06)" stroke-width=".8" stroke-dasharray="5 5"/>
-    <path d="M600,400 Q760,460 920,420" fill="none" stroke="rgba(196,241,44,.06)" stroke-width=".8" stroke-dasharray="5 5"/>
-    <path d="M140,500 Q300,480 460,540" fill="none" stroke="rgba(196,241,44,.05)" stroke-width=".8" stroke-dasharray="5 5"/>
-    <path d="M920,120 Q1040,80 1160,150" fill="none" stroke="rgba(196,241,44,.07)" stroke-width=".8" stroke-dasharray="5 5"/>
-    <path d="M1060,290 Q980,400 920,420" fill="none" stroke="rgba(196,241,44,.05)" stroke-width=".8" stroke-dasharray="4 6"/>
-    <!-- diagonal long connectors -->
-    <path d="M180,120 Q480,400 920,420" fill="none" stroke="rgba(196,241,44,.03)" stroke-width=".6"/>
-    <path d="M1160,150 Q1100,300 920,420" fill="none" stroke="rgba(196,241,44,.04)" stroke-width=".6"/>
+    <!-- ═══════════════════════════════════════
+         AI HUB — central agent (largest node)
+    ═══════════════════════════════════════ -->
+    <g transform="translate(345,200)">
+      <!-- outer glow -->
+      <circle r="60" fill="rgba(196,241,44,.06)" class="hbn-hub-glow"/>
+      <!-- rotating dashed ring -->
+      <circle r="46" fill="none" stroke="rgba(196,241,44,.45)" stroke-width="1" stroke-dasharray="2 5" class="hbn-hub-ring">
+        <animate attributeName="stroke-dashoffset" from="0" to="7" dur="2.4s" repeatCount="indefinite"/>
+      </circle>
+      <!-- inner solid ring -->
+      <circle r="32" fill="rgba(10,10,10,.5)" stroke="rgba(196,241,44,.35)" stroke-width="1"/>
+      <!-- hexagon (AI symbol) -->
+      <polygon points="0,-19 17,-9.5 17,9.5 0,19 -17,9.5 -17,-9.5"
+               fill="rgba(196,241,44,.08)" stroke="rgba(196,241,44,.65)" stroke-width="1.4"/>
+      <!-- AI text -->
+      <text x="0" y="5" text-anchor="middle" fill="rgba(196,241,44,.85)"
+            font-family="'JetBrains Mono',monospace" font-size="13" font-weight="700">AI</text>
+      <!-- sparkle dots inside hex corners -->
+      <circle cx="0" cy="-14" r="1.2" fill="rgba(196,241,44,.55)"/>
+      <circle cx="12" cy="-7" r="1" fill="rgba(196,241,44,.4)"/>
+      <circle cx="12" cy="7" r="1" fill="rgba(196,241,44,.4)"/>
+      <!-- label -->
+      <text x="0" y="56" text-anchor="middle" fill="rgba(196,241,44,.55)"
+            font-family="'JetBrains Mono',monospace" font-size="8" letter-spacing="1.4" font-weight="600">// AI · AGENT</text>
+    </g>
 
-    <!-- abstract interface wireframes (very subtle) -->
-    <!-- browser/app frame top-right -->
-    <rect x="980" y="38" width="200" height="130" fill="none" stroke="rgba(196,241,44,.05)" stroke-width=".8"/>
-    <line x1="980" y1="55" x2="1180" y2="55" stroke="rgba(196,241,44,.05)" stroke-width=".8"/>
-    <rect x="992" y="62" width="80" height="12" fill="rgba(196,241,44,.025)" stroke="none"/>
-    <rect x="992" y="80" width="55" height="8" fill="rgba(196,241,44,.02)" stroke="none"/>
-    <rect x="992" y="94" width="70" height="8" fill="rgba(196,241,44,.02)" stroke="none"/>
-    <rect x="992" y="108" width="45" height="8" fill="rgba(196,241,44,.015)" stroke="none"/>
-    <rect x="1082" y="62" width="88" height="84" fill="rgba(196,241,44,.018)" stroke="rgba(196,241,44,.04)" stroke-width=".5"/>
-    <!-- mini chart inside -->
-    <polyline points="1090,136 1102,122 1114,126 1126,112 1138,108 1150,100 1162,96" fill="none" stroke="rgba(196,241,44,.08)" stroke-width=".8"/>
+    <!-- ═══════════════════════════════════════
+         WHATSAPP node — top left
+    ═══════════════════════════════════════ -->
+    <g transform="translate(165,115)">
+      <circle r="24" fill="rgba(10,10,10,.5)" stroke="rgba(196,241,44,.28)" stroke-width="1"/>
+      <!-- WhatsApp chat bubble (simplified) -->
+      <path d="M-9,-6 a9,9 0 1,1 3.5,15 L-10,11 l1.5,-5 a9,9 0 0,1 -1,-12 z"
+            fill="none" stroke="rgba(196,241,44,.7)" stroke-width="1.4"
+            stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="-3" cy=".5" r=".9" fill="rgba(196,241,44,.7)"/>
+      <circle cx="1"  cy=".5" r=".9" fill="rgba(196,241,44,.7)"/>
+      <circle cx="5"  cy=".5" r=".9" fill="rgba(196,241,44,.7)"/>
+      <text x="0" y="44" text-anchor="middle" fill="rgba(196,241,44,.5)"
+            font-family="'JetBrains Mono',monospace" font-size="7.5" letter-spacing="1.3" font-weight="600">// WHATSAPP</text>
+    </g>
 
-    <!-- UI card bottom-left -->
-    <rect x="40" y="340" width="140" height="90" fill="none" stroke="rgba(196,241,44,.04)" stroke-width=".8"/>
-    <line x1="40" y1="355" x2="180" y2="355" stroke="rgba(196,241,44,.04)" stroke-width=".6"/>
-    <rect x="52" y="364" width="50" height="6" fill="rgba(196,241,44,.02)" stroke="none"/>
-    <rect x="52" y="376" width="35" height="6" fill="rgba(196,241,44,.015)" stroke="none"/>
-    <rect x="52" y="388" width="44" height="6" fill="rgba(196,241,44,.015)" stroke="none"/>
-    <rect x="110" y="362" width="58" height="58" fill="rgba(196,241,44,.015)" stroke="rgba(196,241,44,.03)" stroke-width=".5"/>
+    <!-- ═══════════════════════════════════════
+         EMAIL node — top center
+    ═══════════════════════════════════════ -->
+    <g transform="translate(575,105)">
+      <circle r="24" fill="rgba(10,10,10,.5)" stroke="rgba(196,241,44,.26)" stroke-width="1"/>
+      <!-- envelope -->
+      <rect x="-10" y="-6.5" width="20" height="13" rx=".5" fill="none" stroke="rgba(196,241,44,.65)" stroke-width="1.3"/>
+      <polyline points="-10,-6.5 0,2 10,-6.5" fill="none" stroke="rgba(196,241,44,.65)" stroke-width="1.3"
+                stroke-linejoin="round"/>
+      <text x="0" y="44" text-anchor="middle" fill="rgba(196,241,44,.5)"
+            font-family="'JetBrains Mono',monospace" font-size="7.5" letter-spacing="1.3" font-weight="600">// EMAIL</text>
+    </g>
 
-    <!-- learning/knowledge element: nodes + radial -->
-    <circle cx="680" cy="580" r="24" fill="none" stroke="rgba(196,241,44,.05)" stroke-width=".8" stroke-dasharray="3 3"/>
-    <circle cx="680" cy="580" r="4" fill="rgba(196,241,44,.08)"/>
-    <line x1="680" y1="556" x2="680" y2="540" stroke="rgba(196,241,44,.05)" stroke-width=".7"/>
-    <line x1="704" y1="580" x2="720" y2="580" stroke="rgba(196,241,44,.05)" stroke-width=".7"/>
-    <line x1="695" y1="565" x2="706" y2="554" stroke="rgba(196,241,44,.04)" stroke-width=".7"/>
-    <line x1="656" y1="565" x2="645" y2="554" stroke="rgba(196,241,44,.04)" stroke-width=".7"/>
-    <circle cx="680" cy="538" r="4" fill="none" stroke="rgba(196,241,44,.07)" stroke-width=".8"/>
-    <circle cx="722" cy="580" r="3" fill="none" stroke="rgba(196,241,44,.06)" stroke-width=".7"/>
-    <circle cx="707" cy="552" r="3" fill="none" stroke="rgba(196,241,44,.06)" stroke-width=".7"/>
+    <!-- ═══════════════════════════════════════
+         CRM / Dashboard node — mid-left
+    ═══════════════════════════════════════ -->
+    <g transform="translate(140,395)">
+      <circle r="24" fill="rgba(10,10,10,.5)" stroke="rgba(196,241,44,.26)" stroke-width="1"/>
+      <!-- 2x2 dashboard grid -->
+      <rect x="-10" y="-10" width="8" height="8" rx=".5" fill="none" stroke="rgba(196,241,44,.6)" stroke-width="1.1"/>
+      <rect x="2"   y="-10" width="8" height="8" rx=".5" fill="rgba(196,241,44,.28)" stroke="rgba(196,241,44,.6)" stroke-width="1.1"/>
+      <rect x="-10" y="2"   width="8" height="8" rx=".5" fill="rgba(196,241,44,.14)" stroke="rgba(196,241,44,.6)" stroke-width="1.1"/>
+      <rect x="2"   y="2"   width="8" height="8" rx=".5" fill="none" stroke="rgba(196,241,44,.6)" stroke-width="1.1"/>
+      <text x="0" y="44" text-anchor="middle" fill="rgba(196,241,44,.5)"
+            font-family="'JetBrains Mono',monospace" font-size="7.5" letter-spacing="1.3" font-weight="600">// CRM</text>
+    </g>
 
-    <!-- animated flow particles along network paths (very subtle) -->
-    <circle r="2" fill="rgba(196,241,44,.35)" opacity="0">
-      <animateMotion dur="5s" repeatCount="indefinite" begin="0s"><mpath href="#hbn1"/></animateMotion>
-      <animate attributeName="opacity" values="0;.35;.35;0" keyTimes="0;.1;.9;1" dur="5s" repeatCount="indefinite"/>
+    <!-- ═══════════════════════════════════════
+         DATABASE / Info systems — center
+    ═══════════════════════════════════════ -->
+    <g transform="translate(695,285)">
+      <circle r="24" fill="rgba(10,10,10,.45)" stroke="rgba(196,241,44,.24)" stroke-width="1"/>
+      <!-- cylinder DB icon -->
+      <ellipse cx="0" cy="-7" rx="10" ry="3" fill="none" stroke="rgba(196,241,44,.6)" stroke-width="1.2"/>
+      <path d="M-10,-7 L-10,7 a10,3 0 0,0 20,0 L10,-7" fill="none" stroke="rgba(196,241,44,.6)" stroke-width="1.2"/>
+      <ellipse cx="0" cy="0" rx="10" ry="3" fill="none" stroke="rgba(196,241,44,.35)" stroke-width=".9"/>
+      <text x="0" y="44" text-anchor="middle" fill="rgba(196,241,44,.45)"
+            font-family="'JetBrains Mono',monospace" font-size="7.5" letter-spacing="1.3" font-weight="600">// DATABASE</text>
+    </g>
+
+    <!-- ═══════════════════════════════════════
+         BOOK / Training node — bottom-left
+    ═══════════════════════════════════════ -->
+    <g transform="translate(410,520)">
+      <circle r="24" fill="rgba(10,10,10,.5)" stroke="rgba(196,241,44,.26)" stroke-width="1"/>
+      <!-- open book -->
+      <path d="M-10,-7 C-10,-7 -5,-9 0,-6 C5,-9 10,-7 10,-7 L10,7 C10,7 5,5 0,8 C-5,5 -10,7 -10,7 Z"
+            fill="rgba(196,241,44,.08)" stroke="rgba(196,241,44,.6)" stroke-width="1.2"
+            stroke-linejoin="round"/>
+      <line x1="0" y1="-6" x2="0" y2="8" stroke="rgba(196,241,44,.55)" stroke-width="1"/>
+      <line x1="-7" y1="-3" x2="-3" y2="-4" stroke="rgba(196,241,44,.4)" stroke-width=".7"/>
+      <line x1="-7" y1="0"  x2="-3" y2="-1" stroke="rgba(196,241,44,.4)" stroke-width=".7"/>
+      <line x1="3"  y1="-4" x2="7"  y2="-3" stroke="rgba(196,241,44,.4)" stroke-width=".7"/>
+      <line x1="3"  y1="-1" x2="7"  y2="0"  stroke="rgba(196,241,44,.4)" stroke-width=".7"/>
+      <text x="0" y="44" text-anchor="middle" fill="rgba(196,241,44,.5)"
+            font-family="'JetBrains Mono',monospace" font-size="7.5" letter-spacing="1.3" font-weight="600">// LEARN</text>
+    </g>
+
+    <!-- ═══════════════════════════════════════
+         AGENT_02 — secondary AI agent (mid-right)
+    ═══════════════════════════════════════ -->
+    <g transform="translate(880,460)">
+      <circle r="34" fill="none" stroke="rgba(196,241,44,.12)" stroke-width=".8" stroke-dasharray="2 4"/>
+      <circle r="22" fill="rgba(10,10,10,.4)" stroke="rgba(196,241,44,.22)" stroke-width="1"/>
+      <polygon points="0,-13 11,-6.5 11,6.5 0,13 -11,6.5 -11,-6.5"
+               fill="rgba(196,241,44,.06)" stroke="rgba(196,241,44,.5)" stroke-width="1.2"/>
+      <circle r="2" fill="rgba(196,241,44,.7)"/>
+      <text x="0" y="48" text-anchor="middle" fill="rgba(196,241,44,.42)"
+            font-family="'JetBrains Mono',monospace" font-size="7.5" letter-spacing="1.3" font-weight="600">// AGENT_02</text>
+    </g>
+
+    <!-- Top-right satellite -->
+    <g transform="translate(1085,125)">
+      <circle r="18" fill="none" stroke="rgba(196,241,44,.14)" stroke-dasharray="2 3"/>
+      <polygon points="0,-8 7,-4 7,4 0,8 -7,4 -7,-4" fill="none" stroke="rgba(196,241,44,.35)" stroke-width="1"/>
+      <circle r="1.6" fill="rgba(196,241,44,.55)"/>
+    </g>
+
+    <!-- Right satellite -->
+    <g transform="translate(1185,375)">
+      <circle r="14" fill="none" stroke="rgba(196,241,44,.12)" stroke-dasharray="2 3"/>
+      <circle r="4" fill="none" stroke="rgba(196,241,44,.3)" stroke-width="1"/>
+      <circle r="1.5" fill="rgba(196,241,44,.4)"/>
+    </g>
+
+    <!-- Scattered micro-agents -->
+    <g fill="none" stroke="rgba(196,241,44,.2)" stroke-width=".8">
+      <circle cx="280" cy="610" r="3"/>
+      <circle cx="820" cy="80"  r="3"/>
+      <circle cx="1300" cy="220" r="3"/>
+      <circle cx="55"  cy="280" r="2.5"/>
+      <circle cx="1320" cy="540" r="2.5"/>
+    </g>
+    <g fill="rgba(196,241,44,.25)">
+      <circle cx="280" cy="610" r="1"/>
+      <circle cx="820" cy="80"  r="1"/>
+      <circle cx="1300" cy="220" r="1"/>
+    </g>
+
+    <!-- ═══════════════════════════════════════
+         Animated flow particles (data flowing through the network)
+    ═══════════════════════════════════════ -->
+    <circle class="bg-flow" r="2.8" fill="rgba(196,241,44,.7)" opacity="0">
+      <animateMotion dur="4.5s" repeatCount="indefinite" begin="0s"><mpath href="#hbn-wa-ai"/></animateMotion>
+      <animate attributeName="opacity" values="0;.7;.7;0" keyTimes="0;.12;.88;1" dur="4.5s" repeatCount="indefinite" begin="0s"/>
     </circle>
-    <circle r="2" fill="rgba(196,241,44,.3)" opacity="0">
-      <animateMotion dur="5.5s" repeatCount="indefinite" begin="1s"><mpath href="#hbn2"/></animateMotion>
-      <animate attributeName="opacity" values="0;.3;.3;0" keyTimes="0;.1;.9;1" dur="5.5s" repeatCount="indefinite" begin="1s"/>
+    <circle class="bg-flow" r="2.8" fill="rgba(196,241,44,.65)" opacity="0">
+      <animateMotion dur="5s" repeatCount="indefinite" begin=".8s"><mpath href="#hbn-em-ai"/></animateMotion>
+      <animate attributeName="opacity" values="0;.65;.65;0" keyTimes="0;.12;.88;1" dur="5s" repeatCount="indefinite" begin=".8s"/>
     </circle>
-    <circle r="1.8" fill="rgba(196,241,44,.28)" opacity="0">
-      <animateMotion dur="6s" repeatCount="indefinite" begin="2s"><mpath href="#hbn3"/></animateMotion>
-      <animate attributeName="opacity" values="0;.28;.28;0" keyTimes="0;.1;.9;1" dur="6s" repeatCount="indefinite" begin="2s"/>
+    <circle class="bg-flow" r="2.8" fill="rgba(196,241,44,.7)" opacity="0">
+      <animateMotion dur="5.5s" repeatCount="indefinite" begin="1.6s"><mpath href="#hbn-crm-ai"/></animateMotion>
+      <animate attributeName="opacity" values="0;.7;.7;0" keyTimes="0;.12;.88;1" dur="5.5s" repeatCount="indefinite" begin="1.6s"/>
     </circle>
-    <circle r="1.8" fill="rgba(196,241,44,.25)" opacity="0">
-      <animateMotion dur="4.8s" repeatCount="indefinite" begin="1.5s"><mpath href="#hbn5"/></animateMotion>
-      <animate attributeName="opacity" values="0;.25;.25;0" keyTimes="0;.1;.9;1" dur="4.8s" repeatCount="indefinite" begin="1.5s"/>
+    <circle class="bg-flow" r="2.8" fill="rgba(196,241,44,.6)" opacity="0">
+      <animateMotion dur="5s" repeatCount="indefinite" begin="2.4s"><mpath href="#hbn-ai-db"/></animateMotion>
+      <animate attributeName="opacity" values="0;.6;.6;0" keyTimes="0;.12;.88;1" dur="5s" repeatCount="indefinite" begin="2.4s"/>
     </circle>
-    <circle r="1.8" fill="rgba(196,241,44,.25)" opacity="0">
-      <animateMotion dur="5.2s" repeatCount="indefinite" begin="3s"><mpath href="#hbn8"/></animateMotion>
-      <animate attributeName="opacity" values="0;.25;.25;0" keyTimes="0;.1;.9;1" dur="5.2s" repeatCount="indefinite" begin="3s"/>
+    <circle class="bg-flow" r="2.5" fill="rgba(196,241,44,.55)" opacity="0">
+      <animateMotion dur="4.8s" repeatCount="indefinite" begin="3.2s"><mpath href="#hbn-db-ag2"/></animateMotion>
+      <animate attributeName="opacity" values="0;.55;.55;0" keyTimes="0;.12;.88;1" dur="4.8s" repeatCount="indefinite" begin="3.2s"/>
+    </circle>
+    <circle class="bg-flow" r="2.5" fill="rgba(196,241,44,.6)" opacity="0">
+      <animateMotion dur="5.2s" repeatCount="indefinite" begin="1.2s"><mpath href="#hbn-ai-bk"/></animateMotion>
+      <animate attributeName="opacity" values="0;.6;.6;0" keyTimes="0;.12;.88;1" dur="5.2s" repeatCount="indefinite" begin="1.2s"/>
+    </circle>
+    <circle class="bg-flow" r="2.5" fill="rgba(196,241,44,.55)" opacity="0">
+      <animateMotion dur="5.5s" repeatCount="indefinite" begin="2.8s"><mpath href="#hbn-bk-ag2"/></animateMotion>
+      <animate attributeName="opacity" values="0;.55;.55;0" keyTimes="0;.12;.88;1" dur="5.5s" repeatCount="indefinite" begin="2.8s"/>
+    </circle>
+    <circle class="bg-flow" r="2.2" fill="rgba(196,241,44,.5)" opacity="0">
+      <animateMotion dur="5s" repeatCount="indefinite" begin="3.8s"><mpath href="#hbn-ag2-r"/></animateMotion>
+      <animate attributeName="opacity" values="0;.5;.5;0" keyTimes="0;.12;.88;1" dur="5s" repeatCount="indefinite" begin="3.8s"/>
+    </circle>
+    <circle class="bg-flow" r="2" fill="rgba(196,241,44,.4)" opacity="0">
+      <animateMotion dur="6.5s" repeatCount="indefinite" begin="1.8s"><mpath href="#hbn-em-tr"/></animateMotion>
+      <animate attributeName="opacity" values="0;.4;.4;0" keyTimes="0;.12;.88;1" dur="6.5s" repeatCount="indefinite" begin="1.8s"/>
+    </circle>
+    <circle class="bg-flow" r="2" fill="rgba(196,241,44,.35)" opacity="0">
+      <animateMotion dur="7s" repeatCount="indefinite" begin=".4s"><mpath href="#hbn-crm-ag2"/></animateMotion>
+      <animate attributeName="opacity" values="0;.35;.35;0" keyTimes="0;.12;.88;1" dur="7s" repeatCount="indefinite" begin=".4s"/>
+    </circle>
+    <circle class="bg-flow" r="2" fill="rgba(196,241,44,.4)" opacity="0">
+      <animateMotion dur="6s" repeatCount="indefinite" begin="4.2s"><mpath href="#hbn-ai-ag2"/></animateMotion>
+      <animate attributeName="opacity" values="0;.4;.4;0" keyTimes="0;.12;.88;1" dur="6s" repeatCount="indefinite" begin="4.2s"/>
     </circle>
   </svg>
 
